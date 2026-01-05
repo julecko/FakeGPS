@@ -1,47 +1,125 @@
 package sk.dilino.fakegps
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.location.provider.ProviderProperties
+import android.net.Uri
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import sk.dilino.fakegps.ui.theme.FakeGPSTheme
+import android.provider.Settings
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var locationManager: LocationManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            FakeGPSTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+        setContentView(R.layout.activity_main)
+
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+
+        val latInput = findViewById<EditText>(R.id.latInput)
+        val lonInput = findViewById<EditText>(R.id.lonInput)
+        val btn = findViewById<Button>(R.id.setLocationBtn)
+
+        requestPermissions()
+
+        openMockLocationSettingsIfNeeded()
+
+        btn.setOnClickListener {
+            val lat = latInput.text.toString().toDoubleOrNull()
+            val lon = lonInput.text.toString().toDoubleOrNull()
+
+            if (lat == null || lon == null) {
+                Toast.makeText(this, "Invalid coordinates", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            setMockLocation(lat, lon)
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FakeGPSTheme {
-        Greeting("Android")
+    private fun requestPermissions() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1
+            )
+        }
     }
+
+    private fun setMockLocation(lat: Double, lon: Double) {
+        try {
+            locationManager.addTestProvider(
+                LocationManager.GPS_PROVIDER,
+                false,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                ProviderProperties.POWER_USAGE_LOW,
+                ProviderProperties.ACCURACY_FINE
+            )
+        } catch (_: Exception) {}
+
+        locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true)
+
+        val location = Location(LocationManager.GPS_PROVIDER).apply {
+            latitude = lat
+            longitude = lon
+            accuracy = 1f
+            time = System.currentTimeMillis()
+            elapsedRealtimeNanos = System.nanoTime()
+        }
+
+        try {
+            locationManager.setTestProviderLocation(
+                LocationManager.GPS_PROVIDER,
+                location
+            )
+        } catch (e: SecurityException) {
+            Toast.makeText(
+                this,
+                "App not selected as Mock Location provider",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        Toast.makeText(this, "Mock location set", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openMockLocationSettingsIfNeeded() {
+        if (!Settings.Secure.getString(
+                contentResolver,
+                Settings.Secure.ALLOW_MOCK_LOCATION
+            ).isNullOrEmpty()
+        ) {
+            return
+        }
+
+        Toast.makeText(
+            this,
+            "Select this app as Mock Location App",
+            Toast.LENGTH_LONG
+        ).show()
+
+        startActivity(
+            Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
+        )
+    }
+
 }

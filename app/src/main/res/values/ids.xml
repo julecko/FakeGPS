@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="latInput" type="id" />
+    <item name="lonInput" type="id" />
+    <item name="setLocationBtn" type="id" />
+</resources>
