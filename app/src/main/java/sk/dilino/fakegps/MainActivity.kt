@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import sk.dilino.fakegps.service.MockLocationService
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,7 +43,12 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            setMockLocation(lat, lon)
+            val intent = Intent(this, MockLocationService::class.java).apply {
+                putExtra("lat", lat)
+                putExtra("lon", lon)
+            }
+
+            startForegroundService(intent)
         }
     }
 
@@ -58,48 +64,6 @@ class MainActivity : AppCompatActivity() {
                 1
             )
         }
-    }
-
-    private fun setMockLocation(lat: Double, lon: Double) {
-        try {
-            locationManager.addTestProvider(
-                LocationManager.GPS_PROVIDER,
-                false,
-                false,
-                false,
-                false,
-                true,
-                true,
-                true,
-                ProviderProperties.POWER_USAGE_LOW,
-                ProviderProperties.ACCURACY_FINE
-            )
-        } catch (_: Exception) {}
-
-        locationManager.setTestProviderEnabled(LocationManager.GPS_PROVIDER, true)
-
-        val location = Location(LocationManager.GPS_PROVIDER).apply {
-            latitude = lat
-            longitude = lon
-            accuracy = 1f
-            time = System.currentTimeMillis()
-            elapsedRealtimeNanos = System.nanoTime()
-        }
-
-        try {
-            locationManager.setTestProviderLocation(
-                LocationManager.GPS_PROVIDER,
-                location
-            )
-        } catch (e: SecurityException) {
-            Toast.makeText(
-                this,
-                "App not selected as Mock Location provider",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-        Toast.makeText(this, "Mock location set", Toast.LENGTH_SHORT).show()
     }
 
     private fun openMockLocationSettingsIfNeeded() {
