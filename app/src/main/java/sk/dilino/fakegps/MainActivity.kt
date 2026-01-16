@@ -14,76 +14,56 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import sk.dilino.fakegps.service.MockLocationService
+import sk.dilino.fakegps.util.MockLocationUtils
+import sk.dilino.fakegps.util.PermissionsHelper
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var locationManager: LocationManager
+    private lateinit var map: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        if (!PermissionsHelper.hasLocationPermission(this)) {
+            PermissionsHelper.requestLocationPermission(this)
+        }
 
-        val latInput = findViewById<EditText>(R.id.latInput)
-        val lonInput = findViewById<EditText>(R.id.lonInput)
-        val btn = findViewById<Button>(R.id.setLocationBtn)
+        MockLocationUtils.checkAndPromptMockLocation(this)
 
-        requestPermissions()
+        val mapFragment =
+            supportFragmentManager.findFragmentById(R.id.map)
+                    as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
-        openMockLocationSettingsIfNeeded()
-
-        btn.setOnClickListener {
-            val lat = latInput.text.toString().toDoubleOrNull()
-            val lon = lonInput.text.toString().toDoubleOrNull()
-
-            if (lat == null || lon == null) {
-                Toast.makeText(this, "Invalid coordinates", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val intent = Intent(this, MockLocationService::class.java).apply {
-                putExtra("lat", lat)
-                putExtra("lon", lon)
-            }
-
-            startForegroundService(intent)
+        findViewById<Button>(R.id.startMockBtn).setOnClickListener {
+            val center = map.cameraPosition.target
+            startMockLocationService(center.latitude, center.longitude)
         }
     }
 
-    private fun requestPermissions() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                1
-            )
-        }
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+
+        map.uiSettings.isMyLocationButtonEnabled = false
+        map.uiSettings.isZoomControlsEnabled = true
+
+        val initial = LatLng(48.1486, 17.1077)
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(initial, 15f))
     }
 
-    private fun openMockLocationSettingsIfNeeded() {
-        if (!Settings.Secure.getString(
-                contentResolver,
-                Settings.Secure.ALLOW_MOCK_LOCATION
-            ).isNullOrEmpty()
-        ) {
-            return
+    private fun startMockLocationService(lat: Double, lon: Double) {
+        val intent = Intent(this, MockLocationService::class.java).apply {
+            action = MockLocationService.ACTION_START
+            putExtra("lat", lat)
+            putExtra("lon", lon)
         }
-
-        Toast.makeText(
-            this,
-            "Select this app as Mock Location App",
-            Toast.LENGTH_LONG
-        ).show()
-
-        startActivity(
-            Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
-        )
+        startForegroundService(intent)
     }
-
 }

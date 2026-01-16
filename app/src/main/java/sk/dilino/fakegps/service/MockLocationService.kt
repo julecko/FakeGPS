@@ -9,28 +9,33 @@ import sk.dilino.fakegps.mock_location.MockLocationInjector
 
 class MockLocationService : Service() {
 
+    companion object {
+        const val ACTION_START = "START"
+        const val ACTION_STOP = "STOP"
+    }
+
     private lateinit var injector: MockLocationInjector
-    private val handler = Handler(Looper.getMainLooper())
+
+    private lateinit var handlerThread: HandlerThread
+    private lateinit var handler: Handler
 
     private var lat = 0.0
     private var lon = 0.0
+    private var running = false
 
     private val updateRunnable = object : Runnable {
         override fun run() {
-            lat = jitter(lat)
-            lon = jitter(lon)
-
             injector.inject(lat, lon)
             handler.postDelayed(this, 50)
         }
     }
 
-    private fun jitter(value: Double): Double {
-        return value + (Math.random() - 0.5) * 0.00002
-    }
-
     override fun onCreate() {
         super.onCreate()
+
+        handlerThread = HandlerThread("MockLocationThread")
+        handlerThread.start()
+        handler = Handler(handlerThread.looper)
 
         val locationManager =
             getSystemService(LOCATION_SERVICE) as LocationManager
@@ -43,13 +48,21 @@ class MockLocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        lat = intent?.getDoubleExtra("lat", 0.0) ?: lat
-        lon = intent?.getDoubleExtra("lon", 0.0) ?: lon
-
-        handler.removeCallbacks(updateRunnable)
-        handler.post(updateRunnable)
-
+        when (intent?.action) {
+            ACTION_START -> {
+                lat = intent.getDoubleExtra("lat", lat)
+                lon = intent.getDoubleExtra("lon", lon)
+                startMocking()
+            }
+            ACTION_STOP -> stopSelf()
+        }
         return START_STICKY
+    }
+
+    private fun startMocking() {
+        if (running) return
+        running = true
+        handler.post(updateRunnable)
     }
 
     override fun onDestroy() {
