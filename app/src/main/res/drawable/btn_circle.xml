@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <solid android:color="#00FF00" />           <!-- default = green (start) -->
+    <stroke
+        android:width="2dp"
+        android:color="#44000000" />            <!-- subtle dark shadow/outline -->
+
+    <!-- Optional: nice pressed effect -->
+    <item android:state_pressed="true">
+        <solid android:color="#66FF66" />       <!-- lighter green when pressed -->
+    </item>
+
+</shape>
