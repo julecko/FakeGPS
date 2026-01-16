@@ -4,6 +4,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.location.provider.ProviderProperties
 import android.os.SystemClock
+import android.util.Log
 
 class MockLocationInjector(
     private val locationManager: LocationManager
@@ -15,6 +16,7 @@ class MockLocationInjector(
     )
 
     fun setupProviders() {
+        Log.d("TEST", "TEST")
         for (provider in providers) {
             try {
                 locationManager.addTestProvider(

@@ -3,6 +3,8 @@ package sk.dilino.fakegps
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import android.location.provider.ProviderProperties
@@ -11,6 +13,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -26,6 +29,7 @@ import sk.dilino.fakegps.util.PermissionsHelper
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
+    private var mocking = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,9 +46,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        findViewById<Button>(R.id.startMockBtn).setOnClickListener {
-            val center = map.cameraPosition.target
-            startMockLocationService(center.latitude, center.longitude)
+        val toggleBtn = findViewById<ImageButton>(R.id.mockToggleBtn)
+
+        toggleBtn.setOnClickListener {
+            val googleMap = map ?: return@setOnClickListener
+
+            if (!mocking) {
+                val center = googleMap.cameraPosition.target
+                setMapLocked(true)
+
+                startMock(center.latitude, center.longitude)
+
+                toggleBtn.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#D32F2F"))
+                toggleBtn.setImageResource(R.drawable.ic_stop)
+                toggleBtn.imageTintList = ColorStateList.valueOf(Color.BLACK)
+
+                mocking = true
+            } else {
+                stopMock()
+
+                setMapLocked(false)
+
+                toggleBtn.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#00C853"))
+                toggleBtn.setImageResource(R.drawable.ic_play)
+                toggleBtn.imageTintList = ColorStateList.valueOf(Color.BLACK)
+
+                mocking = false
+            }
         }
     }
 
@@ -52,18 +80,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         map = googleMap
 
         map.uiSettings.isMyLocationButtonEnabled = false
-        map.uiSettings.isZoomControlsEnabled = true
+        map.uiSettings.isZoomControlsEnabled = false
 
         val initial = LatLng(48.1486, 17.1077)
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(initial, 15f))
     }
 
-    private fun startMockLocationService(lat: Double, lon: Double) {
-        val intent = Intent(this, MockLocationService::class.java).apply {
+    private fun startMock(lat: Double, lon: Double) {
+        Intent(this, MockLocationService::class.java).apply {
             action = MockLocationService.ACTION_START
             putExtra("lat", lat)
             putExtra("lon", lon)
+        }.also(::startForegroundService)
+    }
+
+    private fun stopMock() {
+        Intent(this, MockLocationService::class.java).apply {
+            action = MockLocationService.ACTION_STOP
+        }.also(::startService)
+    }
+
+    private fun setMapLocked(locked: Boolean) {
+        map.uiSettings.apply {
+            isScrollGesturesEnabled = !locked
+            isZoomGesturesEnabled = !locked
+            isRotateGesturesEnabled = !locked
+            isTiltGesturesEnabled = !locked
+            isMyLocationButtonEnabled = !locked
         }
-        startForegroundService(intent)
     }
 }

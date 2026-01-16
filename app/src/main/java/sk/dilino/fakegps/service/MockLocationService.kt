@@ -66,7 +66,11 @@ class MockLocationService : Service() {
     }
 
     override fun onDestroy() {
+        running = false
+
         handler.removeCallbacks(updateRunnable)
+        handlerThread.quitSafely()
+
         injector.cleanup()
         super.onDestroy()
     }
