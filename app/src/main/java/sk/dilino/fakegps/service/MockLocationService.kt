@@ -25,7 +25,11 @@ class MockLocationService : Service() {
 
     private val updateRunnable = object : Runnable {
         override fun run() {
-            injector.inject(lat, lon)
+            val ok = injector.inject(lat, lon)
+            if (!ok) {
+                stopSelf()
+                return
+            }
             handler.postDelayed(this, 50)
         }
     }
@@ -62,11 +66,14 @@ class MockLocationService : Service() {
     private fun startMocking() {
         if (running) return
         running = true
+        setRunningState(true)
         handler.post(updateRunnable)
     }
 
     override fun onDestroy() {
         running = false
+
+        setRunningState(false)
 
         handler.removeCallbacks(updateRunnable)
         handlerThread.quitSafely()
@@ -94,5 +101,12 @@ class MockLocationService : Service() {
             getSystemService(NotificationManager::class.java)
                 .createNotificationChannel(channel)
         }
+    }
+
+    private fun setRunningState(value: Boolean) {
+        getSharedPreferences("mock_location", MODE_PRIVATE)
+            .edit()
+            .putBoolean("running", value)
+            .apply()
     }
 }

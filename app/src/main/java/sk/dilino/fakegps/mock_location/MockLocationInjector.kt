@@ -39,9 +39,11 @@ class MockLocationInjector(
         }
     }
 
-    fun inject(lat: Double, lon: Double) {
+    fun inject(lat: Double, lon: Double): Boolean {
         val now = System.currentTimeMillis()
         val elapsed = SystemClock.elapsedRealtimeNanos()
+
+        var success = true
 
         for (provider in providers) {
             val location = Location(provider).apply {
@@ -57,11 +59,15 @@ class MockLocationInjector(
                 time = now
                 elapsedRealtimeNanos = elapsed
             }
-
             try {
                 locationManager.setTestProviderLocation(provider, location)
-            } catch (_: SecurityException) {}
+            } catch (e: SecurityException) {
+                success = false
+            } catch (e: IllegalArgumentException) {
+                success = false
+            }
         }
+        return success
     }
 
     fun cleanup() {

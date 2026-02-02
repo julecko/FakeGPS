@@ -26,12 +26,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
 import sk.dilino.fakegps.service.MockLocationService
 import sk.dilino.fakegps.util.MockLocationUtils
 import sk.dilino.fakegps.util.PermissionsHelper
 import sk.dilino.fakegps.util.PermissionsHelper.hasLocationPermission
-import com.google.android.libraries.places.api.model.Place
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -47,13 +45,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (!Places.isInitialized()) {
-            Places.initialize(this, "YOUR_API_KEY")
-        }
-
         if (!hasLocationPermission(this)) {
             PermissionsHelper.requestLocationPermission(this)
         }
+
+        ensureMockLocationEnabled()
 
         MockLocationUtils.checkAndPromptMockLocation(this)
 
@@ -63,31 +59,24 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         val toggleBtn = findViewById<ImageButton>(R.id.mockToggleBtn)
+
+        mocking = isMockRunning()
+        applyButtonState(toggleBtn, mocking)
+
         toggleBtn.setOnClickListener {
             val googleMap = map ?: return@setOnClickListener
 
             if (!mocking) {
-                val center = googleMap.cameraPosition.target
+                val center = map.cameraPosition.target
                 setMapLocked(true)
-
                 startMock(center.latitude, center.longitude)
-
-                toggleBtn.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#D32F2F"))
-                toggleBtn.setImageResource(R.drawable.ic_stop)
-                toggleBtn.imageTintList = ColorStateList.valueOf(Color.BLACK)
-
                 mocking = true
             } else {
                 stopMock()
-
                 setMapLocked(false)
-
-                toggleBtn.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#00C853"))
-                toggleBtn.setImageResource(R.drawable.ic_play)
-                toggleBtn.imageTintList = ColorStateList.valueOf(Color.BLACK)
-
                 mocking = false
             }
+            applyButtonState(toggleBtn, mocking)
         }
     }
 
@@ -153,5 +142,36 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             isTiltGesturesEnabled = !locked
             isMyLocationButtonEnabled = !locked
         }
+    }
+
+    private fun isMockRunning(): Boolean {
+        return getSharedPreferences("mock_location", MODE_PRIVATE)
+            .getBoolean("running", false)
+    }
+
+    private fun applyButtonState(btn: ImageButton, running: Boolean) {
+        if (running) {
+            btn.backgroundTintList =
+                ColorStateList.valueOf(Color.parseColor("#D32F2F"))
+            btn.setImageResource(R.drawable.ic_stop)
+        } else {
+            btn.backgroundTintList =
+                ColorStateList.valueOf(Color.parseColor("#00C853"))
+            btn.setImageResource(R.drawable.ic_play)
+        }
+        btn.imageTintList = ColorStateList.valueOf(Color.BLACK)
+    }
+
+    private fun ensureMockLocationEnabled() {
+    Toast.makeText(
+        this,
+        "This app needs to be set as Mock Location app",
+        Toast.LENGTH_LONG
+    ).show()
+        Toast.makeText(
+            this,
+            "Open Developer Options manually to select Mock Location app",
+            Toast.LENGTH_LONG
+        ).show()
     }
 }
