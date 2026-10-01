@@ -6,9 +6,26 @@
     <string name="tutorial_step_1">Enable Developer options: open Settings > About phone and tap \"Build number\" 7 times.</string>
     <string name="tutorial_step_2">Open Settings > System > Developer options, find \"Select mock location app\" and choose FakeGPS.</string>
     <string name="tutorial_step_3">Move the map so the red marker sits on the place you want to fake.</string>
-    <string name="tutorial_step_4">Tap the green play button to start faking. Tap the red stop button to stop. Tap the ? button on the side to see this guide again.</string>
     <string name="tutorial_next">Next</string>
     <string name="tutorial_back">Back</string>
     <string name="tutorial_done">Done</string>
     <string name="tutorial_open_dev">Developer options</string>
+    <string name="mode_single">Single location</string>
+    <string name="mode_route">Route</string>
+    <string name="route_undo">Undo</string>
+    <string name="route_clear">Clear</string>
+    <string name="route_hint">Move the map and press Add point</string>
+    <string name="route_add_point">Add point</string>
+    <string name="start_faking">Start faking</string>
+    <string name="stop_faking">Stop faking</string>
+    <string name="route_need_two">Add at least 2 waypoints</string>
+    <string name="speed_title">Walking speed</string>
+    <string name="speed_custom">Custom…</string>
+    <string name="speed_custom_hint">Speed in km/h</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="arrived_title">Destination reached</string>
+    <string name="arrived_message">You arrived at the final point. Fake GPS keeps running at this location until you stop it.</string>
+    <string name="tutorial_step_4">Single location mode: tap the green play button to fake that spot. Route mode: move the map so the pin is where you want a waypoint, press Add point, repeat, pick a speed, then press play to walk the route; the app keeps faking at the final point until you tap stop. Tap the ? button to see this guide again.</string>
+    <string name="speed_label">Speed: %1$s</string>
 </resources>

@@ -39,7 +39,7 @@ class MockLocationInjector(
         }
     }
 
-    fun inject(lat: Double, lon: Double): Boolean {
+    fun inject(lat: Double, lon: Double, speed: Float = 0f, bearing: Float = 0f): Boolean {
         val now = System.currentTimeMillis()
         val elapsed = SystemClock.elapsedRealtimeNanos()
 
@@ -53,8 +53,8 @@ class MockLocationInjector(
                 // 🔒 REALISTIC STATIC VALUES
                 accuracy = 6f          // meters (5–10m = normal GPS)
                 altitude = 250.0       // meters above sea level (pick something sane)
-                speed = 0f             // stationary
-                bearing = 0f           // no movement → no direction
+                this.speed = speed     // m/s, 0 when stationary
+                this.bearing = bearing // degrees, direction of travel
 
                 time = now
                 elapsedRealtimeNanos = elapsed

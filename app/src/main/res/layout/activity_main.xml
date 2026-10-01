@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,40 +11,143 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Crosshair -->
+    <!-- Target pin: its tip is at the exact center of the screen / map -->
     <ImageView
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center"
-        android:src="@android:drawable/ic_menu_mylocation"
-        app:tint="@android:color/holo_red_dark" />
-
-    <!-- Help button -->
-    <ImageButton
-        android:id="@+id/helpBtn"
+        android:id="@+id/crosshair"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="12dp"
-        android:background="@drawable/btn_circle"
-        android:backgroundTint="#FFFFFF"
-        android:src="@drawable/ic_help"
-        android:scaleType="fitCenter"
-        android:padding="10dp"
-        android:elevation="6dp"
-        android:contentDescription="@string/show_tutorial" />
+        android:layout_gravity="center"
+        android:translationY="-20dp"
+        android:src="@drawable/ic_pin"
+        android:importantForAccessibility="no" />
 
-    <!-- Floating button -->
-    <ImageButton
-        android:id="@+id/mockToggleBtn"
-        android:layout_width="88dp"
-        android:layout_height="88dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/btn_circle"
-        android:src="@drawable/ic_play"
-        android:scaleType="fitCenter"
-        android:padding="20dp"
-        android:elevation="6dp"
-        android:contentDescription="@string/toggle_mock_location" />
+    <!-- Mode switch -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="6dp">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/modeGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/modeSingleBtn"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_single" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/modeRouteBtn"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mode_route" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Help button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/helpBtn"
+        style="@style/Widget.Material3.FloatingActionButton.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/show_tutorial"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_help" />
+
+    <!-- Bottom control card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/routeInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+            <LinearLayout
+                android:id="@+id/routeButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/addPointBtn"
+                        style="@style/Widget.Material3.Button.TonalButton.Icon"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/route_add_point"
+                        app:icon="@drawable/ic_add_location" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/undoBtn"
+                        style="@style/Widget.Material3.Button.IconButton.Outlined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@string/route_undo"
+                        app:icon="@drawable/ic_undo" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/clearBtn"
+                        style="@style/Widget.Material3.Button.IconButton.Outlined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@string/route_clear"
+                        app:icon="@drawable/ic_delete" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/speedBtn"
+                    style="@style/Widget.Material3.Button.OutlinedButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_speed" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mockToggleBtn"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/start_faking"
+                android:textSize="18sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_play"
+                app:iconGravity="textStart"
+                app:iconSize="28dp"
+                app:iconTint="@android:color/white" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 </FrameLayout>
