@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">FakeGPS</string>
     <string name="toggle_mock_location">Toggle mock location</string>
+    <string name="show_tutorial">Show tutorial</string>
+    <string name="tutorial_title">How to use FakeGPS (%1$d/%2$d)</string>
+    <string name="tutorial_step_1">Enable Developer options: open Settings > About phone and tap \"Build number\" 7 times.</string>
+    <string name="tutorial_step_2">Open Settings > System > Developer options, find \"Select mock location app\" and choose FakeGPS.</string>
+    <string name="tutorial_step_3">Move the map so the red marker sits on the place you want to fake.</string>
+    <string name="tutorial_step_4">Tap the green play button to start faking. Tap the red stop button to stop. Tap the ? button on the side to see this guide again.</string>
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_back">Back</string>
+    <string name="tutorial_done">Done</string>
+    <string name="tutorial_open_dev">Developer options</string>
 </resources>

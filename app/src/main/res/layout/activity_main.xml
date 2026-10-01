@@ -18,6 +18,21 @@
         android:src="@android:drawable/ic_menu_mylocation"
         app:tint="@android:color/holo_red_dark" />
 
+    <!-- Help button -->
+    <ImageButton
+        android:id="@+id/helpBtn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/btn_circle"
+        android:backgroundTint="#FFFFFF"
+        android:src="@drawable/ic_help"
+        android:scaleType="fitCenter"
+        android:padding="10dp"
+        android:elevation="6dp"
+        android:contentDescription="@string/show_tutorial" />
+
     <!-- Floating button -->
     <ImageButton
         android:id="@+id/mockToggleBtn"

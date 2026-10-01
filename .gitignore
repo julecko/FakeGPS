@@ -8,8 +8,15 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
+build/
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Secrets - never commit real API keys
+apikeys.properties
+
+# Signing keys
+*.jks
+*.keystore

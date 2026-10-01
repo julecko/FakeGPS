@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -49,9 +50,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             PermissionsHelper.requestLocationPermission(this)
         }
 
-        ensureMockLocationEnabled()
+        findViewById<ImageButton>(R.id.helpBtn).setOnClickListener { showTutorial() }
 
-        MockLocationUtils.checkAndPromptMockLocation(this)
+        val prefs = getSharedPreferences("app", MODE_PRIVATE)
+        if (!prefs.getBoolean("tutorial_seen", false)) {
+            prefs.edit().putBoolean("tutorial_seen", true).apply()
+            showTutorial()
+        }
 
         val mapFragment =
             supportFragmentManager.findFragmentById(R.id.map)
@@ -162,16 +167,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         btn.imageTintList = ColorStateList.valueOf(Color.BLACK)
     }
 
-    private fun ensureMockLocationEnabled() {
-    Toast.makeText(
-        this,
-        "This app needs to be set as Mock Location app",
-        Toast.LENGTH_LONG
-    ).show()
-        Toast.makeText(
-            this,
-            "Open Developer Options manually to select Mock Location app",
-            Toast.LENGTH_LONG
-        ).show()
+    private fun showTutorial(step: Int = 0) {
+        val steps = intArrayOf(
+            R.string.tutorial_step_1,
+            R.string.tutorial_step_2,
+            R.string.tutorial_step_3,
+            R.string.tutorial_step_4
+        )
+        val last = step == steps.lastIndex
+        val builder = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.tutorial_title, step + 1, steps.size))
+            .setMessage(steps[step])
+            .setPositiveButton(if (last) R.string.tutorial_done else R.string.tutorial_next) { _, _ ->
+                if (!last) showTutorial(step + 1)
+            }
+        if (step > 0) {
+            builder.setNegativeButton(R.string.tutorial_back) { _, _ -> showTutorial(step - 1) }
+        }
+        if (step == 1) {
+            builder.setNeutralButton(R.string.tutorial_open_dev) { _, _ ->
+                startActivity(Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS))
+            }
+        }
+        builder.show()
     }
 }
