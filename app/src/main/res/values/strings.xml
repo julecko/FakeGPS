@@ -11,7 +11,7 @@
     <string name="tutorial_back">Back</string>
     <string name="tutorial_done">Done</string>
     <string name="tutorial_open_dev">Developer options</string>
-    <string name="mode_single">Single location</string>
+    <string name="mode_single">Point</string>
     <string name="mode_route">Route</string>
     <string name="route_undo">Undo</string>
     <string name="route_clear">Clear</string>
