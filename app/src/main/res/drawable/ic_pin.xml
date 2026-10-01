@@ -1,9 +1,24 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- White outline for contrast on any map background -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M24,24m-12,0a12,12 0 1,1 24,0a12,12 0 1,1 -24,0M24,4L24,14M24,34L24,44M4,24L14,24M34,24L44,24" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,24m-3.5,0a3.5,3.5 0 1,1 7,0a3.5,3.5 0 1,1 -7,0" />
+    <!-- Red target -->
+    <path
+        android:strokeColor="#E53935"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M24,24m-12,0a12,12 0 1,1 24,0a12,12 0 1,1 -24,0M24,4L24,14M24,34L24,44M4,24L14,24M34,24L44,24" />
     <path
         android:fillColor="#E53935"
-        android:pathData="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13c0,-3.87 -3.13,-7 -7,-7zM12,11.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5z"/>
+        android:pathData="M24,24m-2,0a2,2 0 1,1 4,0a2,2 0 1,1 -4,0" />
 </vector>

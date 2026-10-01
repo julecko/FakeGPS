@@ -11,13 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Target pin: its tip is at the exact center of the screen / map -->
+    <!-- Target crosshair: its center is at the exact center of the screen / map -->
     <ImageView
         android:id="@+id/crosshair"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="center"
-        android:translationY="-20dp"
         android:src="@drawable/ic_pin"
         android:importantForAccessibility="no" />
 
@@ -41,14 +40,14 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/modeSingleBtn"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
+                android:layout_width="112dp"
                 android:layout_height="wrap_content"
                 android:text="@string/mode_single" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/modeRouteBtn"
                 style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
+                android:layout_width="112dp"
                 android:layout_height="wrap_content"
                 android:text="@string/mode_route" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
@@ -64,8 +63,23 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="@string/show_tutorial"
-        app:fabSize="mini"
+        app:fabCustomSize="32dp"
+        app:maxImageSize="18dp"
         app:srcCompat="@drawable/ic_help" />
+
+    <!-- Center on real GPS location (hidden while faking) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/myLocationBtn"
+        style="@style/Widget.Material3.FloatingActionButton.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/center_on_me"
+        app:fabCustomSize="32dp"
+        app:maxImageSize="18dp"
+        app:srcCompat="@drawable/ic_my_location" />
 
     <!-- Bottom control card -->
     <com.google.android.material.card.MaterialCardView

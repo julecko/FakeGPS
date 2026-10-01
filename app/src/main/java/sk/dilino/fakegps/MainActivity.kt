@@ -25,6 +25,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -116,6 +117,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             onRouteChanged()
         }
         findViewById<Button>(R.id.speedBtn).setOnClickListener { showSpeedDialog() }
+        findViewById<View>(R.id.myLocationBtn).setOnClickListener { centerOnRealLocation() }
 
         toggleBtn.setOnClickListener { onToggleClicked() }
 
@@ -181,6 +183,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         // Mode can't be changed while faking is on.
         findViewById<View>(R.id.modeSingleBtn).isEnabled = !mocking
         findViewById<View>(R.id.modeRouteBtn).isEnabled = !mocking
+
+        // Real GPS is overridden by the mock while faking, so centering is only offered when idle.
+        findViewById<View>(R.id.myLocationBtn).visibility = if (mocking) View.GONE else View.VISIBLE
 
         findViewById<View>(R.id.routeButtons).visibility =
             if (mode == Mode.ROUTE && !mocking) View.VISIBLE else View.GONE
@@ -395,6 +400,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(this, "Failed to get location – using fallback", Toast.LENGTH_SHORT).show()
             moveMapTo(fallbackLocation)
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun centerOnRealLocation() {
+        if (mocking || !::map.isInitialized) return
+        if (!hasLocationPermission(this)) {
+            requestPermissionsIfNeeded()
+            return
+        }
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener { location: Location? ->
+                if (mocking) return@addOnSuccessListener
+                if (location != null) {
+                    map.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 17f)
+                    )
+                } else {
+                    Toast.makeText(this, "Location unavailable", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to get location", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun moveMapTo(latLng: LatLng) {
